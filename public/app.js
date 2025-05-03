@@ -578,7 +578,7 @@ function updateTimer() {
     // Format remaining time
     const minutes = Math.floor(remainingSeconds / 60);
     const seconds = remainingSeconds % 60;
-    timeRemainingEl.textContent = `Time Remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    timeRemainingEl.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     
     // Add warning class when less than 5 minutes remaining
     if (remainingSeconds < 300 && !timeRemainingEl.classList.contains('time-warning')) {
