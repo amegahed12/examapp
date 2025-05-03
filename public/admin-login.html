@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Exam App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-box admin-box">
+            <h1>Exam App</h1>
+            <h2>Admin Login</h2>
+            <form id="admin-login-form" class="auth-form">
+                <div class="form-group">
+                    <label for="admin-username">Admin Username</label>
+                    <input type="text" id="admin-username" placeholder="Enter admin username" required>
+                </div>
+                <div class="form-group">
+                    <label for="admin-password">Admin Password</label>
+                    <input type="password" id="admin-password" placeholder="Enter admin password" required>
+                </div>
+                <button type="submit" class="auth-btn admin-btn">Login as Admin</button>
+            </form>
+            <div class="auth-links">
+                <p>Regular user? <a href="login.html">User login</a></p>
+                <p>Need an admin account? Contact system administrator</p>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html> 

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam App Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- User Dashboard -->
+        <div id="user-dashboard" class="section hidden">
+            <div class="dashboard-header">
+                <h2>Available Exams</h2>
+                <button id="logout-btn" class="logout-btn">Logout</button>
+            </div>
+            <div id="exams-list">
+                <!-- Exam cards will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Exam Taking Section -->
+        <div id="exam-section" class="section hidden">
+            <div class="exam-header">
+                <h2 id="exam-title"></h2>
+                <div class="header-right">
+                    <div id="timer">Time remaining: <span id="time-remaining">00:00</span></div>
+                    <button id="logout-btn" class="logout-btn">Logout</button>
+                </div>
+            </div>
+            <div id="question-container">
+                <div class="exam-layout">
+                    <div id="question-nav-panel">
+                        <h3>Questions</h3>
+                        <div id="question-nav-buttons">
+                            <!-- Question navigation buttons will be added here dynamically -->
+                        </div>
+                    </div>
+                    <div class="question-content">
+                        <div id="current-question"></div>
+                        <div class="navigation-buttons">
+                            <button id="prev-question" disabled>Previous</button>
+                            <button id="next-question">Next</button>
+                            <button id="mark-review">Mark for Review</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="submit-section">
+                <button id="submit-exam">Submit Exam</button>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div id="admin-dashboard" class="section hidden">
+            <div class="dashboard-header">
+                <h2>Admin Dashboard</h2>
+                <button id="logout-btn" class="logout-btn">Logout</button>
+            </div>
+            <div class="admin-actions">
+                <button id="create-exam">Create New Exam</button>
+                <button id="view-users">View Users</button>
+                <button id="view-results">View Results</button>
+            </div>
+            <div id="admin-content"></div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html> 
