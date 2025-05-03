@@ -8,15 +8,18 @@ let markedQuestions = [];
 let examStartTime = null;
 let examEndTime = null;
 let timerInterval = null;
+let currentAttempt = null;
 
 // DOM Elements
 const userDashboard = document.getElementById('user-dashboard');
 const examSection = document.getElementById('exam-section');
 const adminDashboard = document.getElementById('admin-dashboard');
+const attemptDetailsSection = document.getElementById('attempt-details-section');
 const loginForm = document.getElementById('login-form');
 const registerForm = document.getElementById('register-form');
 const adminLoginForm = document.getElementById('admin-login-form');
 const examsList = document.getElementById('exams-list');
+const historyList = document.getElementById('history-list');
 const examTitle = document.getElementById('exam-title');
 const timeRemaining = document.getElementById('time-remaining');
 const currentQuestion = document.getElementById('current-question');
@@ -24,11 +27,17 @@ const prevQuestionBtn = document.getElementById('prev-question');
 const nextQuestionBtn = document.getElementById('next-question');
 const markReviewBtn = document.getElementById('mark-review');
 const submitExamBtn = document.getElementById('submit-exam');
-const logoutBtn = document.getElementById('logout-btn');
+const logoutBtn = document.querySelectorAll('#logout-btn');
 const createExamBtn = document.getElementById('create-exam');
 const viewUsersBtn = document.getElementById('view-users');
 const viewResultsBtn = document.getElementById('view-results');
 const adminContent = document.getElementById('admin-content');
+const availableExamsTab = document.getElementById('available-exams-tab');
+const examHistoryTab = document.getElementById('exam-history-tab');
+const availableExamsContent = document.getElementById('available-exams-content');
+const examHistoryContent = document.getElementById('exam-history-content');
+const backToHistoryBtn = document.getElementById('back-to-history-btn');
+const attemptDetailsContainer = document.getElementById('attempt-details-container');
 
 // Event Listeners
 if (loginForm) loginForm.addEventListener('submit', handleLogin);
@@ -38,15 +47,15 @@ if (prevQuestionBtn) prevQuestionBtn.addEventListener('click', showPreviousQuest
 if (nextQuestionBtn) nextQuestionBtn.addEventListener('click', showNextQuestion);
 if (markReviewBtn) markReviewBtn.addEventListener('click', markQuestionForReview);
 if (submitExamBtn) submitExamBtn.addEventListener('click', submitExam);
-
-// Add logout event listener to all logout buttons
-document.querySelectorAll('.logout-btn').forEach(button => {
-    button.addEventListener('click', handleLogout);
-});
-
 if (createExamBtn) createExamBtn.addEventListener('click', showCreateExamForm);
 if (viewUsersBtn) viewUsersBtn.addEventListener('click', showUsersList);
 if (viewResultsBtn) viewResultsBtn.addEventListener('click', showAdminExamResults);
+if (backToHistoryBtn) backToHistoryBtn.addEventListener('click', backToHistory);
+
+// Apply logout functionality to all logout buttons
+logoutBtn.forEach(btn => {
+    if (btn) btn.addEventListener('click', handleLogout);
+});
 
 // Authentication Functions
 async function handleLogin(e) {
@@ -153,13 +162,224 @@ async function showDashboard() {
         adminDashboard.classList.remove('hidden');
         userDashboard.classList.add('hidden');
         examSection.classList.add('hidden');
+        attemptDetailsSection.classList.add('hidden');
         showAdminDashboard();
     } else {
         userDashboard.classList.remove('hidden');
         adminDashboard.classList.add('hidden');
         examSection.classList.add('hidden');
+        attemptDetailsSection.classList.add('hidden');
+        
+        // Set up tab event listeners
+        setupDashboardTabs();
+        
+        // Load available exams by default
         loadExams();
     }
+}
+
+function setupDashboardTabs() {
+    // Add event listeners to tabs
+    availableExamsTab.addEventListener('click', () => {
+        setActiveTab(availableExamsTab, availableExamsContent);
+        loadExams();
+    });
+    
+    examHistoryTab.addEventListener('click', () => {
+        setActiveTab(examHistoryTab, examHistoryContent);
+        loadExamHistory();
+    });
+}
+
+function setActiveTab(activeTab, activeContent) {
+    // Reset all tabs
+    availableExamsTab.classList.remove('active');
+    examHistoryTab.classList.remove('active');
+    availableExamsContent.classList.remove('active');
+    examHistoryContent.classList.remove('active');
+    
+    // Set active tab
+    activeTab.classList.add('active');
+    activeContent.classList.add('active');
+}
+
+async function loadExamHistory() {
+    historyList.innerHTML = '<div class="loading">Loading your exam history...</div>';
+    
+    try {
+        const response = await fetch('/api/exams/history', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to load exam history');
+        }
+
+        const attempts = await response.json();
+        displayExamHistory(attempts);
+    } catch (error) {
+        console.error('Error loading exam history:', error);
+        historyList.innerHTML = `
+            <div class="error-message">
+                <h3>Error Loading History</h3>
+                <p>${error.message}</p>
+            </div>
+        `;
+    }
+}
+
+function displayExamHistory(attempts) {
+    if (attempts.length === 0) {
+        historyList.innerHTML = '<p>You have not taken any exams yet.</p>';
+        return;
+    }
+
+    historyList.innerHTML = '';
+
+    attempts.forEach(attempt => {
+        // Calculate percentage score
+        const scorePercentage = (attempt.score / attempt.totalQuestions) * 100;
+        let scoreClass = 'score-medium';
+        
+        if (scorePercentage >= 80) {
+            scoreClass = 'score-high';
+        } else if (scorePercentage < 50) {
+            scoreClass = 'score-low';
+        }
+
+        const attemptCard = document.createElement('div');
+        attemptCard.className = 'history-card';
+
+        // Check if exam exists or was deleted
+        const examTitle = attempt.exam ? attempt.exam.title : 'Deleted Exam';
+        
+        attemptCard.innerHTML = `
+            <div class="history-card-header">
+                <span class="history-card-title">${examTitle}</span>
+                <span class="history-card-score ${scoreClass}">${attempt.score}/${attempt.totalQuestions} (${scorePercentage.toFixed(1)}%)</span>
+            </div>
+            <div class="history-card-date">
+                <span>Submitted: ${new Date(attempt.submittedAt).toLocaleString()}</span>
+            </div>
+            <div class="history-card-details">
+                <button class="history-card-action" data-attempt-id="${attempt._id}">View Details</button>
+            </div>
+        `;
+
+        historyList.appendChild(attemptCard);
+    });
+
+    // Add event listeners to detail buttons
+    document.querySelectorAll('.history-card-action').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const attemptId = e.target.dataset.attemptId;
+            if (attemptId) {
+                viewAttemptDetails(attemptId);
+            }
+        });
+    });
+}
+
+async function viewAttemptDetails(attemptId) {
+    try {
+        const response = await fetch(`/api/exams/attempts/${attemptId}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to load attempt details');
+        }
+
+        currentAttempt = await response.json();
+        displayAttemptDetails();
+        
+        // Show the attempt details section
+        userDashboard.classList.add('hidden');
+        attemptDetailsSection.classList.remove('hidden');
+    } catch (error) {
+        console.error('Error loading attempt details:', error);
+        alert('Error loading attempt details');
+    }
+}
+
+function displayAttemptDetails() {
+    if (!currentAttempt || !currentAttempt.exam) {
+        attemptDetailsContainer.innerHTML = '<p>Error: Attempt details not available.</p>';
+        return;
+    }
+
+    const scorePercentage = (currentAttempt.score / currentAttempt.totalQuestions) * 100;
+    const examDuration = currentAttempt.endTime ? 
+        Math.round((new Date(currentAttempt.endTime) - new Date(currentAttempt.startTime)) / (60 * 1000)) : 
+        'N/A';
+
+    // Generate the attempt summary HTML
+    attemptDetailsContainer.innerHTML = `
+        <h3>${currentAttempt.exam.title}</h3>
+        <div class="attempt-summary">
+            <div class="summary-item">
+                <div class="summary-label">Score</div>
+                <div class="summary-value">${currentAttempt.score}/${currentAttempt.totalQuestions} (${scorePercentage.toFixed(1)}%)</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Date Taken</div>
+                <div class="summary-value">${new Date(currentAttempt.submittedAt).toLocaleDateString()}</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Time Spent</div>
+                <div class="summary-value">${examDuration} minutes</div>
+            </div>
+        </div>
+        
+        <h3>Questions and Answers</h3>
+        <div class="attempt-questions">
+            ${generateQuestionsAnswersHTML()}
+        </div>
+    `;
+}
+
+function generateQuestionsAnswersHTML() {
+    if (!currentAttempt.exam.questions || !currentAttempt.answers) {
+        return '<p>No questions or answers available.</p>';
+    }
+
+    let questionsHTML = '';
+
+    currentAttempt.exam.questions.forEach((question, index) => {
+        const userAnswer = currentAttempt.answers[index] || 'No answer provided';
+        const isCorrect = question.correctAnswer === userAnswer;
+        let answerDisplay;
+
+        // Format the answer display based on question type
+        if (question.type === 'mcq') {
+            const selectedOption = question.options.find(opt => opt === userAnswer) || 'No answer';
+            answerDisplay = selectedOption;
+        } else if (question.type === 'truefalse') {
+            answerDisplay = userAnswer === 'true' ? 'True' : 'False';
+        } else {
+            answerDisplay = userAnswer;
+        }
+
+        questionsHTML += `
+            <div class="attempt-question">
+                <div class="question-header">Question ${index + 1}: ${question.question}</div>
+                <div class="user-answer ${isCorrect ? 'answer-correct' : 'answer-incorrect'}">
+                    <strong>Your Answer:</strong> ${answerDisplay}
+                </div>
+                ${question.type !== 'written' ? 
+                    `<div class="correct-answer">
+                        <strong>Correct Answer:</strong> ${question.correctAnswer}
+                    </div>` : 
+                    ''}
+            </div>
+        `;
+    });
+
+    return questionsHTML;
 }
 
 async function loadExams() {
@@ -1476,4 +1696,10 @@ function updateQuestionNavigationPanel() {
         
         navButtons.appendChild(button);
     });
+}
+
+function backToHistory() {
+    attemptDetailsSection.classList.add('hidden');
+    userDashboard.classList.remove('hidden');
+    setActiveTab(examHistoryTab, examHistoryContent);
 } 

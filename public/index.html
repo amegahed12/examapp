@@ -11,11 +11,28 @@
         <!-- User Dashboard -->
         <div id="user-dashboard" class="section hidden">
             <div class="dashboard-header">
-                <h2>Available Exams</h2>
-                <button id="logout-btn" class="logout-btn">Logout</button>
+                <h2>Dashboard</h2>
+                <div class="header-right">
+                    <button id="logout-btn" class="logout-btn">Logout</button>
+                </div>
             </div>
-            <div id="exams-list">
-                <!-- Exam cards will be dynamically added here -->
+            <div class="dashboard-tabs">
+                <button id="available-exams-tab" class="tab-btn active">Available Exams</button>
+                <button id="exam-history-tab" class="tab-btn">Exam History</button>
+            </div>
+            
+            <div id="available-exams-content" class="tab-content active">
+                <h3>Available Exams</h3>
+                <div id="exams-list">
+                    <!-- Exam cards will be dynamically added here -->
+                </div>
+            </div>
+            
+            <div id="exam-history-content" class="tab-content">
+                <h3>Your Exam History</h3>
+                <div id="history-list">
+                    <!-- Exam history will be dynamically added here -->
+                </div>
             </div>
         </div>
 
@@ -48,6 +65,19 @@
             </div>
             <div class="submit-section">
                 <button id="submit-exam">Submit Exam</button>
+            </div>
+        </div>
+
+        <!-- Exam Attempt Details Section -->
+        <div id="attempt-details-section" class="section hidden">
+            <div class="dashboard-header">
+                <h2 id="attempt-title">Exam Attempt Details</h2>
+                <div class="header-right">
+                    <button id="back-to-history-btn" class="back-btn">Back to History</button>
+                </div>
+            </div>
+            <div id="attempt-details-container">
+                <!-- Attempt details will be dynamically added here -->
             </div>
         </div>
 

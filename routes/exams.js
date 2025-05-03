@@ -194,4 +194,41 @@ router.post('/sample', authenticateToken, async (req, res) => {
     }
 });
 
+// Get user's exam history
+router.get('/history', authenticateToken, async (req, res) => {
+    try {
+        // Find all exam attempts by this user
+        const attempts = await ExamAttempt.find({ user: req.user.userId })
+            .populate('exam', 'title description duration')
+            .sort({ submittedAt: -1 });
+
+        res.json(attempts);
+    } catch (error) {
+        console.error('Error fetching exam history:', error);
+        res.status(500).json({ message: 'Error fetching exam history', error: error.message });
+    }
+});
+
+// Get specific attempt details
+router.get('/attempts/:attemptId', authenticateToken, async (req, res) => {
+    try {
+        const attempt = await ExamAttempt.findById(req.params.attemptId)
+            .populate('exam');
+            
+        if (!attempt) {
+            return res.status(404).json({ message: 'Attempt not found' });
+        }
+        
+        // Ensure the user owns this attempt
+        if (attempt.user.toString() !== req.user.userId) {
+            return res.status(403).json({ message: 'Access denied' });
+        }
+        
+        res.json(attempt);
+    } catch (error) {
+        console.error('Error fetching attempt details:', error);
+        res.status(500).json({ message: 'Error fetching attempt details', error: error.message });
+    }
+});
+
 module.exports = router; 
