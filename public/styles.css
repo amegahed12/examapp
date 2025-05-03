@@ -819,4 +819,136 @@ tr:hover {
     flex: 1;
 }
 
-/* Other Exam Section Styles */ 
+/* Other Exam Section Styles */
+
+/* Button Styles */
+.back-btn {
+    padding: 8px 15px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 15px;
+    transition: background-color 0.3s;
+}
+
+.back-btn:hover {
+    background-color: #5a6268;
+}
+
+#mark-review {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+#mark-review:hover {
+    background-color: #e0a800;
+}
+
+.start-exam-btn {
+    padding: 8px 15px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 14px;
+}
+
+.start-exam-btn:hover {
+    background-color: #218838;
+}
+
+.view-user-exams-btn {
+    padding: 6px 12px;
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.3s;
+}
+
+.view-user-exams-btn:hover {
+    background-color: #138496;
+}
+
+.view-results-btn {
+    padding: 6px 12px;
+    background-color: #6610f2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.3s;
+}
+
+.view-results-btn:hover {
+    background-color: #520dc2;
+}
+
+.edit-exam-btn {
+    padding: 6px 12px;
+    background-color: #fd7e14;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.3s;
+}
+
+.edit-exam-btn:hover {
+    background-color: #e36a0c;
+}
+
+#back-button {
+    padding: 10px 20px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+#back-button:hover {
+    background-color: #5a6268;
+}
+
+/* Add consistent styling for buttons without classes in admin sections */
+#create-exam, #view-users, #view-results {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background-color 0.3s;
+}
+
+#create-exam:hover, #view-users:hover, #view-results:hover {
+    background-color: #0056b3;
+}
+
+/* Ensure all buttons have consistent focus state */
+button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* Additional hover effect for better UX */
+button {
+    transition: transform 0.1s;
+}
+
+button:active {
+    transform: scale(0.98);
+} 
